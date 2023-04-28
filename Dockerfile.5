@@ -1,0 +1,20 @@
+FROM python:3.7.16-slim as base
+
+FROM base as builder
+
+RUN mkdir /install
+WORKDIR /install
+COPY requirements.txt /requirements.txt
+RUN pip install --prefix=/install -r /requirements.txt
+
+FROM base
+
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+COPY . .
+
+RUN python -m spacy download en_core_web_sm
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]

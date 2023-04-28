@@ -1,0 +1,24 @@
+FROM python:3.7.16-slim as base
+
+FROM base as builder
+
+RUN mkdir /install
+WORKDIR /install
+COPY requirements.txt /requirements.txt
+RUN pip install --prefix=/install -r /requirements.txt
+
+FROM base
+
+RUN groupadd -g 999 python && \
+    useradd -r -u 999 -g python python
+
+RUN mkdir /app && chown python:python /app
+WORKDIR /app
+
+COPY --chown=python:python --from=builder /install /usr/local
+COPY --chown=python:python . .
+
+RUN python -m spacy download en_core_web_sm
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]

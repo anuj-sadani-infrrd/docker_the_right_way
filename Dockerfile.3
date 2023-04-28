@@ -1,0 +1,21 @@
+# Set the base image to Ubuntu
+FROM python:3.7.16-slim
+
+# Upgrade the pip
+RUN pip install --upgrade pip
+RUN pip install --upgrade setuptools
+
+# Copy the current directory contents into the container at /app
+WORKDIR /app
+COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt
+RUN pip install -r requirements.txt
+
+RUN python -m spacy download en_core_web_sm
+
+# Copy the current directory contents into the container at /app
+COPY . .
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]
